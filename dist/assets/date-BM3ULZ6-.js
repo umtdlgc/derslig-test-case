@@ -1,1 +1,0 @@
-import{a as n}from"./apiClient-CRu48vI1.js";const i={getAll(){return n.get("/events")},getById(e){return n.get(`/events/${e}`)}};function g(e){var t;const a=new Date(e),r=navigator.language||((t=navigator.languages)==null?void 0:t[0])||"en-US";return a.toLocaleDateString(r,{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}export{i as e,g as f};
