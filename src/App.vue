@@ -17,6 +17,7 @@ export default {
     EmptyLayout
   },
   setup() {
+    console.log('App component mounted')
     const route = useRoute()
     const layout = computed(() => route.meta.layout || 'DefaultLayout')
     return { layout }
