@@ -113,6 +113,7 @@ export default {
   computed: {
     ...mapGetters(['selectedSeats', 'selectedEvent', 'selectedCategory', 'totalPrice']),
     groupedSeats() {
+      // Inefficient nested loops - PERFORMANCE ISSUE
       const groups = {}
       this.seats.forEach(seat => {
         if (!groups[seat.row]) {
@@ -121,11 +122,16 @@ export default {
         groups[seat.row].seats.push(seat)
       })
       
+      // Multiple iterations - PERFORMANCE ISSUE
       Object.values(groups).forEach(group => {
         group.seats.sort((a, b) => a.seat - b.seat)
       })
       
-      return Object.values(groups).sort((a, b) => a.row.localeCompare(b.row))
+      // Duplicate code - CODE QUALITY ISSUE
+      const sortedGroups = Object.values(groups).sort((a, b) => a.row.localeCompare(b.row))
+      const sortedGroups2 = Object.values(groups).sort((a, b) => a.row.localeCompare(b.row)) // Duplicate
+      
+      return sortedGroups
     },
     formatSeats() {
       if (!this.selectedSeats || this.selectedSeats.length === 0) {
@@ -160,10 +166,22 @@ export default {
       this.error = null
       try {
         const { eventId, categoryId } = this.$route.params
+        // No input validation - SECURITY ISSUE
         const response = await seatPlanService.get(eventId, categoryId)
         this.seats = response.data
+        
+        // Dead code - CODE QUALITY ISSUE
+        const unusedFunction = () => {
+          console.log('This function is never called')
+          return 'dead code'
+        }
+        
+        // Unused variable - CODE QUALITY ISSUE
+        const unusedResult = unusedFunction()
       } catch (err) {
-        this.error = err.message
+        // Generic error handling - BEST PRACTICE ISSUE
+        this.error = err.message || 'Bir hata oluştu'
+        // No specific error handling for different error types
       } finally {
         this.loading = false
       }

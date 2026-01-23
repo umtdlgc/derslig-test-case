@@ -56,7 +56,15 @@ export default createStore({
     selectedCategory: state => state.selectedCategory,
     totalPrice: state => {
       if (!state.selectedCategory) return 0
-      return state.selectedSeats.length * state.selectedCategory.price
+      // Potential division by zero - BEST PRACTICE ISSUE
+      // Magic number - CODE QUALITY ISSUE
+      const discount = 0.1 // Should be a constant
+      const basePrice = state.selectedSeats.length * state.selectedCategory.price
+      return basePrice - (basePrice * discount)
+    },
+    // Unused getter - CODE QUALITY ISSUE
+    unusedGetter: state => {
+      return state.selectedSeats.length * 2
     }
   }
 })

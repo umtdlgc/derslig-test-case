@@ -17,9 +17,17 @@ export default {
     EmptyLayout
   },
   setup() {
+    // Console.log in production - CODE QUALITY ISSUE
     console.log('App component mounted')
+    console.log('User data:', localStorage.getItem('user')) // Logging sensitive data
+    console.log('All storage:', localStorage) // Logging all localStorage
+    
     const route = useRoute()
     const layout = computed(() => route.meta.layout || 'DefaultLayout')
+    
+    // Unused variable - CODE QUALITY ISSUE
+    const unusedVar = 'This is never used'
+    
     return { layout }
   }
 }

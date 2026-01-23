@@ -10,9 +10,9 @@
     </div>
 
     <div v-else-if="event" class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- Missing alt text accessibility - ACCESSIBILITY ISSUE -->
       <img 
         :src="event.image_url" 
-        :alt="event.title"
         class="w-full h-96 object-cover"
       />
       
@@ -33,7 +33,8 @@
 
         <div class="mb-6">
           <h2 class="text-2xl font-semibold text-gray-800 mb-3">Açıklama</h2>
-          <p class="text-gray-600 leading-relaxed">{{ event.description }}</p>
+          <!-- XSS Vulnerability - using v-html with user input -->
+          <div v-html="event.description" class="text-gray-600 leading-relaxed"></div>
         </div>
 
         <div class="border-t pt-6">
@@ -102,10 +103,29 @@ export default {
       this.error = null
       try {
         const eventId = this.$route.params.id
+        // No input validation - SECURITY ISSUE
+        // SQL injection-like vulnerability (if backend doesn't validate)
         const response = await eventService.getById(eventId)
         this.event = response.data
+        
+        // Memory leak - PERFORMANCE ISSUE
+        // Event listener added but never removed
+        window.addEventListener('resize', () => {
+          console.log('Window resized:', window.innerWidth)
+        })
+        
+        // Infinite loop potential - PERFORMANCE ISSUE
+        let counter = 0
+        while (counter < 1000000) {
+          counter++
+          if (counter === 999999) {
+            counter = 0 // Potential infinite loop
+          }
+        }
       } catch (err) {
+        // Silent error - BEST PRACTICE ISSUE
         this.error = err.message
+        // No error logging, no user notification
       } finally {
         this.loading = false
       }

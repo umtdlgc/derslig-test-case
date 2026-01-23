@@ -112,7 +112,8 @@
               <p v-if="validationErrors.cvv" class="text-red-500 text-xs -mt-4 mb-4">{{ validationErrors.cvv }}</p>
 
               <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {{ error }}
+                <!-- XSS Vulnerability - using v-html with user input -->
+                <div v-html="error"></div>
               </div>
 
               <button
@@ -192,7 +193,12 @@ export default {
         expiry: '',
         cvv: '',
         email: ''
-      }
+      },
+      // Unused variable - CODE QUALITY ISSUE
+      unusedVariable: 'This is never used',
+      // Magic numbers - CODE QUALITY ISSUE
+      maxRetries: 3,
+      timeout: 5000
     }
   },
   computed: {
@@ -317,10 +323,11 @@ export default {
       this.error = null
 
       try {
+        // Missing null check - BEST PRACTICE ISSUE
         const paymentData = {
-          eventId: this.selectedEvent.id,
-          eventCategoryId: this.selectedCategory.id,
-          seats: this.selectedSeats.map(s => s.id),
+          eventId: this.selectedEvent.id, // Could be null
+          eventCategoryId: this.selectedCategory.id, // Could be null
+          seats: this.selectedSeats.map(s => s.id), // No null check
           customer_name: this.form.customerName,
           customer_surname: this.form.customerSurname,
           customer_email: this.form.customerEmail,
@@ -330,8 +337,13 @@ export default {
           cc_cvv: this.form.ccCvv
         }
 
+        // Console.log in production - CODE QUALITY ISSUE
+        console.log('Payment data:', paymentData)
+        console.log('Credit card:', paymentData.cc_number) // Logging sensitive data
+
         const response = await paymentService.process(paymentData)
         
+        // Magic number - CODE QUALITY ISSUE
         if (response.data.code === 201 && response.data.status === 'success') {
           this.$store.dispatch('clearBooking')
           this.$router.push({ name: 'PaymentSuccess' })
@@ -339,7 +351,9 @@ export default {
           this.error = response.data.message || 'Ödeme işlemi başarısız oldu.'
         }
       } catch (err) {
-        this.error = err.message
+        // Poor error handling - BEST PRACTICE ISSUE
+        this.error = err.message || 'Bir hata oluştu'
+        // No error reporting, no retry logic
       } finally {
         this.loading = false
       }
